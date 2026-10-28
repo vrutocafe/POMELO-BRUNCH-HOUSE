@@ -613,8 +613,8 @@ async function toggleMenuItem(item) {
 
     try {
       const { data, error } = await supabase
-        .from('subscriptions')
-        .select('*')
+          .from('subscriptions')
+            .select('*, subscription_items(*)')
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -670,14 +670,18 @@ async function toggleMenuItem(item) {
 
   const stats = useMemo(() => {
     const revenue = activeOrders.reduce(
-      (sum, order) => sum + (PLANS[order.plan]?.price || 0),
-      0
-    );
+  (sum, order) => sum + Number(order.price_mxn || 0),
+  0
+);
 
-    const meals = activeOrders.reduce(
-      (sum, order) => sum + (PLANS[order.plan]?.meals || 0),
-      0
-    );
+const meals = activeOrders.reduce(
+  (sum, order) =>
+    sum +
+    (order.subscription_items?.length ||
+      PLANS[order.plan]?.meals ||
+      0),
+  0
+);
 
     return {
       active: activeOrders.length,
@@ -1326,22 +1330,26 @@ async function submitSubscription(event) {
                   </Field>
                 </div>
 
-                <div className="summary">
-                  <div className="summary-row">
-                    <span>Plan seleccionado</span>
-                    <strong>{PLANS[plan].name}</strong>
-                  </div>
 
-                  <div className="summary-row">
-                    <span>Servicio</span>
-                    <span>{PLANS[plan].meals} días · lunes a viernes</span>
-                  </div>
+<div className="summary">
+  <div className="summary-row">
+    <span>Días seleccionados</span>
+    <strong>{selectedMealRows.length}</strong>
+  </div>
 
-                  <div className="summary-row summary-total">
-                    <span>Total del plan</span>
-                    <strong>{money(PLANS[plan].price)} MXN</strong>
-                  </div>
-                </div>
+  {selectedMealRows.map((row) => (
+    <div className="summary-row" key={row.day_of_week}>
+      <span>{row.day_of_week} · {row.item.name}</span>
+      <strong>{money(row.item.price_mxn)}</strong>
+    </div>
+  ))}
+
+  <div className="summary-row summary-total">
+    <span>Total del pedido</span>
+    <strong>{money(orderTotal)} MXN</strong>
+  </div>
+</div>
+
 
                 <label className="consent">
                   <input type="checkbox" required />
@@ -1516,6 +1524,137 @@ async function submitSubscription(event) {
             />
           </div>
 
+<section className="admin-panel orders-panel" id="menu-management">
+  <div className="panel-heading">
+    <h3>Menu management.</h3>
+    <small>Crear y editar platillos</small>
+  </div>
+
+  {menuError && (
+    <div className="alert alert-error" role="alert">{menuError}</div>
+  )}
+  {menuNotice && (
+    <div className="alert alert-success" role="status">{menuNotice}</div>
+  )}
+
+  <form onSubmit={saveMenuItem}>
+    <div className="form-grid">
+      <Field label="Nombre del platillo *">
+        <input
+          value={menuDraft.name}
+          onChange={(e) =>
+            setMenuDraft({ ...menuDraft, name: e.target.value })
+          }
+          maxLength={120}
+          required
+        />
+      </Field>
+
+      <Field label="Precio (MXN) *">
+        <input
+          type="number"
+          min="0"
+          step="0.01"
+          value={menuDraft.price_mxn}
+          onChange={(e) =>
+            setMenuDraft({ ...menuDraft, price_mxn: e.target.value })
+          }
+          required
+        />
+      </Field>
+
+      <Field label="Descripción" full>
+        <textarea
+          value={menuDraft.description}
+          onChange={(e) =>
+            setMenuDraft({ ...menuDraft, description: e.target.value })
+          }
+          maxLength={500}
+          placeholder="Ingredientes o descripción breve"
+        />
+      </Field>
+    </div>
+
+    <p><strong>Días disponibles</strong></p>
+    <div className="menu-day-options">
+      {WEEK_DAYS.map((day) => (
+        <label key={day}>
+          <input
+            type="checkbox"
+            checked={menuDraft.available_days.includes(day)}
+            onChange={(e) => {
+              const days = e.target.checked
+                ? [...menuDraft.available_days, day]
+                : menuDraft.available_days.filter((d) => d !== day);
+
+              setMenuDraft({ ...menuDraft, available_days: days });
+            }}
+          />
+          {day}
+        </label>
+      ))}
+    </div>
+
+    <label className="consent">
+      <input
+        type="checkbox"
+        checked={menuDraft.active}
+        onChange={(e) =>
+          setMenuDraft({ ...menuDraft, active: e.target.checked })
+        }
+      />
+      <span>Platillo visible para los clientes</span>
+    </label>
+
+    <div className="admin-actions">
+      <button className="action-btn action-primary" type="submit">
+        {menuDraft.id ? 'Guardar cambios' : 'Agregar platillo'}
+      </button>
+
+      {menuDraft.id && (
+        <button
+          className="action-btn"
+          type="button"
+          onClick={resetMenuDraft}
+        >
+          Cancelar edición
+        </button>
+      )}
+    </div>
+  </form>
+
+  <div className="menu-admin-list">
+    {menuItems.map((item) => (
+      <article className="menu-admin-item" key={item.id}>
+        <div>
+          <strong>{item.name}</strong>
+          <p>{item.description || 'Sin descripción'}</p>
+          <small>
+            {money(item.price_mxn)} · {(item.available_days || []).join(', ')}
+          </small>
+          <p>{item.active ? 'Visible' : 'Desactivado'}</p>
+        </div>
+
+        <div className="admin-actions">
+          <button
+            type="button"
+            className="mini-btn"
+            onClick={() => editMenuItem(item)}
+          >
+            Editar
+          </button>
+          <button
+            type="button"
+            className="mini-btn"
+            onClick={() => toggleMenuItem(item)}
+          >
+            {item.active ? 'Desactivar' : 'Activar'}
+          </button>
+        </div>
+      </article>
+    ))}
+  </div>
+</section>
           <div className="admin-grid">
             <section className="admin-panel">
               <div className="panel-heading">
@@ -1705,6 +1844,27 @@ async function submitSubscription(event) {
                         value={order.dietary_notes || 'No especificadas'}
                       />
                     </div>
+                     
+{order.subscription_items?.length > 0 && (
+  <div className="order-meals">
+    <strong>Platillos del pedido</strong>
+
+    {order.subscription_items
+      .slice()
+      .sort(
+        (a, b) =>
+          WEEK_DAYS.indexOf(a.day_of_week) -
+          WEEK_DAYS.indexOf(b.day_of_week)
+      )
+      .map((item) => (
+        <div className="summary-row" key={item.id}>
+          <span>{item.day_of_week} · {item.meal_name}</span>
+          <strong>{money(item.unit_price_mxn)}</strong>
+        </div>
+      ))}
+  </div>
+)}
+
 
                     <div className="order-tags">
                       <span className="order-tag diet">{order.diet}</span>
@@ -3035,6 +3195,97 @@ function Styles() {
           animation-duration: .01ms !important;
         }
       }
-    `}</style>
+      
+.meal-day-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 20px;
+}
+
+.meal-day-card {
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  padding: 16px;
+  background: #FDFCF9;
+}
+
+.meal-day-card.selected {
+  border-color: var(--forest);
+  background: white;
+}
+
+.meal-day-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.meal-day-toggle input,
+.menu-day-options input {
+  accent-color: var(--forest);
+}
+
+.meal-day-card .field {
+  margin-top: 18px;
+}
+
+.menu-day-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.menu-day-options label {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  font-size: 11px;
+}
+
+.menu-admin-list {
+  margin-top: 28px;
+}
+
+.menu-admin-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 18px 0;
+  border-top: 1px solid var(--line);
+}
+
+.menu-admin-item p {
+  margin: 7px 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.order-meals {
+  margin-top: 18px;
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--forest-light);
+}
+
+.order-meals > strong {
+  display: block;
+  margin-bottom: 12px;
+}
+
+@media (max-width: 600px) {
+  .meal-day-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .menu-admin-item {
+    flex-direction: column;
+  }
+}
+    </style>
   );
 }

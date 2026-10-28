@@ -1,34 +1,286 @@
 <!doctype html>
 <html lang="es">
-  <head>
-    
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#f5f2eb">
+<meta name="description" content="Pomelo Brunch House. Comida fresca y suscripciones semanales en Mazatlán.">
+<title>Pomelo Brunch House — Comer bien, sin complicarlo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#f5f2eb;--paper:#fffdf8;--ink:#272a22;--muted:#77796e;--olive:#596044;--olive-dark:#3e4632;--line:#dedbd0;--orange:#d97848;--soft:#e8e5d9;--danger:#a23e35;--ok:#45694c;--serif:"Cormorant Garamond",Georgia,serif;--sans:"DM Sans",Arial,sans-serif}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.55}button,input,select,textarea{font:inherit}button{cursor:pointer}.topline{background:var(--olive-dark);color:#f7f4eb;text-align:center;padding:8px 14px;font-size:10px;letter-spacing:.2em;text-transform:uppercase}.nav{max-width:1180px;margin:auto;padding:22px 24px;display:flex;align-items:center;justify-content:space-between;gap:20px}.brand{display:flex;gap:12px;align-items:center;border:0;background:none;text-align:left;color:inherit;padding:0}.mark{display:grid;place-items:center;width:45px;height:45px;background:var(--olive);color:white;font-family:var(--serif);font-size:35px;line-height:1;border-radius:50%}.brand-name{display:block;font-family:var(--serif);font-size:25px;line-height:1.05}.brand-sub{display:block;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-top:5px}.nav-links{display:flex;align-items:center;gap:22px}.nav-links a,.nav-links button{color:var(--ink);text-decoration:none;border:0;background:none;font-size:12px}.nav-links .nav-cta{background:var(--olive);color:white;padding:12px 17px}.wrap{max-width:1180px;margin:auto;padding:0 24px}.hero{display:grid;grid-template-columns:.9fr 1.1fr;min-height:480px;gap:50px;align-items:center;padding:30px 0 76px}.eyebrow{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--olive);font-weight:700}.hero h1{font:500 clamp(52px,7vw,91px)/.88 var(--serif);letter-spacing:-.04em;margin:22px 0}.hero h1 em{color:var(--olive);font-weight:400}.hero p{color:#64675d;max-width:390px;font-size:15px}.button{display:inline-flex;align-items:center;justify-content:center;gap:12px;background:var(--olive);color:#fff;border:1px solid var(--olive);padding:14px 20px;text-decoration:none;font-size:12px;letter-spacing:.03em}.button:hover{background:var(--olive-dark)}.button.secondary{background:transparent;color:var(--ink);border-color:var(--line)}.hero-meta{margin-top:28px;font-size:9px;letter-spacing:.18em;color:var(--muted)}.hero-photo{min-height:430px;background:#d6d3c5;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}.hero-photo img{width:100%;height:100%;position:absolute;inset:0;object-fit:cover}.photo-placeholder{font:italic 28px var(--serif);color:#656b55;text-align:center;padding:40px}.photo-label{position:absolute;left:18px;right:18px;bottom:18px;background:rgba(255,253,248,.93);padding:13px 16px;display:flex;justify-content:space-between;gap:12px;font-size:9px;letter-spacing:.12em;text-transform:uppercase}.section{padding:66px 0;border-top:1px solid var(--line)}.section-head{display:flex;align-items:end;justify-content:space-between;gap:24px;margin-bottom:30px}.section h2{font:500 clamp(39px,5vw,60px)/.95 var(--serif);letter-spacing:-.03em;margin:10px 0}.section-head p{max-width:440px;color:var(--muted);font-size:13px;margin:0}.nutrition{display:grid;grid-template-columns:1fr 1fr;gap:16px}.panel{background:var(--paper);border:1px solid var(--line);padding:26px}.panel h3{font:500 29px var(--serif);margin:0 0 15px}.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.field{display:flex;flex-direction:column;gap:6px;margin-bottom:13px}.field label{font-size:11px;color:#595c52}.field input,.field select,.field textarea{width:100%;border:1px solid var(--line);background:#fffefa;padding:12px;color:var(--ink);border-radius:0;min-width:0}.field textarea{min-height:82px;resize:vertical}.field input:focus,.field select:focus,.field textarea:focus{outline:1px solid var(--olive)}.metrics{display:grid;grid-template-columns:1fr 1fr;gap:10px}.metric{background:var(--soft);padding:20px}.metric small{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}.metric strong{display:block;font:500 35px var(--serif);margin:4px 0}.hint,.muted{color:var(--muted);font-size:12px}.menu-days{display:grid;gap:14px}.day-card{border:1px solid var(--line);background:var(--paper);padding:18px}.day-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:13px}.day-head h3{font:500 27px var(--serif);margin:0}.day-head small{font-size:10px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase}.dish-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.dish{position:relative}.dish input{position:absolute;opacity:0;pointer-events:none}.dish label{height:100%;display:flex;flex-direction:column;border:1px solid var(--line);padding:14px;cursor:pointer;transition:.15s}.dish input:checked+label{border-color:var(--olive);background:#edf0e5;box-shadow:inset 0 0 0 1px var(--olive)}.dish-name{font-weight:600;font-size:13px}.dish-desc{font-size:11px;color:var(--muted);margin:5px 0 12px;flex:1}.dish-price{font-size:13px;font-weight:700;color:var(--olive-dark)}.dish-empty{padding:18px;background:#eeece4;color:var(--muted);font-size:12px}.order-layout{display:grid;grid-template-columns:1.1fr .9fr;gap:20px;align-items:start}.summary{position:sticky;top:15px}.summary-row{display:flex;justify-content:space-between;gap:16px;border-bottom:1px solid var(--line);padding:10px 0;font-size:12px}.summary-total{font-size:16px;font-weight:700;border-bottom:0;padding-top:17px}.full{width:100%}.notice{padding:13px 15px;margin:12px 0;font-size:12px;background:#edf0e5;color:var(--ok)}.notice.error{background:#f6e8e5;color:var(--danger)}.fineprint{font-size:10px;color:var(--muted)}.footer{background:var(--olive-dark);color:#f8f5ed;padding:35px 24px;margin-top:60px}.footer-inner{max-width:1180px;margin:auto;display:flex;justify-content:space-between;gap:20px;align-items:center}.footer p{font-size:11px;color:#d5d5c9}.admin-link{color:inherit;opacity:.7;font-size:10px;background:none;border:0;text-decoration:underline}.hidden{display:none!important}.admin-wrap{padding:28px 0 70px}.admin-top{display:flex;justify-content:space-between;gap:18px;align-items:center;margin-bottom:22px}.admin-top h1{font:500 48px var(--serif);margin:0}.admin-actions{display:flex;flex-wrap:wrap;gap:8px}.admin-actions button{padding:10px 13px;border:1px solid var(--line);background:var(--paper);font-size:11px}.admin-actions .primary{background:var(--olive);color:white}.admin-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}.stat{background:var(--paper);border:1px solid var(--line);padding:20px}.stat small{font-size:10px;color:var(--muted);text-transform:uppercase}.stat strong{display:block;font:500 33px var(--serif)}.admin-panel{background:var(--paper);border:1px solid var(--line);padding:22px;margin:16px 0}.admin-panel h2{font:500 30px var(--serif);margin:0 0 15px}.table-wrap{overflow:auto}table{border-collapse:collapse;width:100%;min-width:760px;font-size:11px}th,td{border-bottom:1px solid var(--line);padding:11px 9px;text-align:left;vertical-align:top}th{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}td select{padding:7px;border:1px solid var(--line);background:white;max-width:155px}td button{border:1px solid var(--line);background:white;padding:7px 9px;font-size:10px}.admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}.status-pill{font-size:10px;background:#eeece4;padding:5px 7px}.admin-form{display:grid;grid-template-columns:1fr 1fr;gap:12px}.admin-form .wide{grid-column:1/-1}.login-card{max-width:430px;margin:60px auto;background:var(--paper);border:1px solid var(--line);padding:30px}.login-card h1{font:500 42px var(--serif);margin:8px 0}.login-card form{margin-top:20px}.check-row{display:flex;gap:9px;align-items:center;font-size:11px;margin:12px 0}.check-row input{width:auto}.small-btn{font-size:10px;padding:6px 8px;border:1px solid var(--line);background:white}.separator{border:0;border-top:1px solid var(--line);margin:22px 0}
+@media(max-width:760px){.nav{padding:17px 18px}.brand-name{font-size:21px}.nav-links{gap:10px}.nav-links a{display:none}.nav-links .nav-cta{padding:10px 11px}.wrap{padding:0 18px}.hero{grid-template-columns:1fr;gap:24px;padding:20px 0 45px;min-height:0}.hero h1{font-size:65px}.hero-photo{min-height:320px}.section{padding:48px 0}.section-head{display:block}.section-head p{margin-top:12px}.nutrition,.order-layout,.admin-grid{grid-template-columns:1fr}.summary{position:static}.dish-grid{grid-template-columns:1fr 1fr}.field-grid{grid-template-columns:1fr}.admin-stats{grid-template-columns:1fr 1fr}.admin-top{align-items:flex-start;flex-direction:column}.admin-top h1{font-size:39px}.footer-inner{align-items:flex-start;flex-direction:column}.admin-form{grid-template-columns:1fr}.admin-form .wide{grid-column:auto}}
+@media(max-width:420px){.dish-grid{grid-template-columns:1fr}.hero h1{font-size:57px}.metrics{grid-template-columns:1fr 1fr}.panel{padding:18px}}
+</style>
+</head>
+<body>
+<div class="topline">Good food, good mood · Mazatlán, Sinaloa</div>
+<header class="nav">
+  <button class="brand" id="homeBtn" aria-label="Pomelo inicio"><span class="mark">p.</span><span><span class="brand-name">Pomelo Brunch House</span><span class="brand-sub">Everyday nourishment</span></span></button>
+  <nav class="nav-links"><a href="#como-funciona">Cómo funciona</a><a href="#menu">Menú semanal</a><button class="nav-cta" id="navAdmin">Chef's desk ↗</button></nav>
+</header>
 
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#FAF7F2" />
+<main id="clientView">
+<div class="wrap">
+  <section class="hero">
+    <div>
+      <div class="eyebrow">Pomelo Brunch House · Mazatlán</div>
+      <h1>Comer bien,<br><em>sin complicarlo.</em></h1>
+      <p>Comida hecha con intención. Ingredientes frescos y un menú que se adapta a tu semana.</p>
+      <a class="button" href="#suscripcion">Crear mi menú <span>↗</span></a>
+      <div class="hero-meta">COCINA FRESCA · A TU RITMO</div>
+    </div>
+    <div class="hero-photo">
+      <div class="photo-placeholder" id="photoPlaceholder">Fresh food.<br>Thoughtfully made.</div>
+      <div class="photo-label"><span>01 / Daily nourishment</span><span>Hecho para tu día a día.</span></div>
+    </div>
+  </section>
 
-    <meta
-      name="description"
-      content="Pomelo Brunch House. Suscripciones de comida saludable en Mazatlán, Sinaloa."
-    />
+  <section class="section" id="como-funciona">
+    <div class="section-head"><div><div class="eyebrow">A little better, every day</div><h2>Tu semana, más sencilla.</h2></div><p>Elige los platillos que quieres recibir. Revisaremos tu solicitud y confirmaremos contigo disponibilidad, horario y pago.</p></div>
+    <div class="nutrition">
+      <div class="panel"><h3>Una rutina que sí se adapta.</h3><p class="muted">Selecciona tus días, elige un platillo por día y comparte tus datos de entrega. El total se calcula automáticamente con los precios del menú.</p><p class="muted">Las solicitudes están sujetas a confirmación del equipo de Pomelo.</p></div>
+      <div class="panel"><h3>Tu perfil nutricional.</h3><div class="field-grid">
+        <div class="field"><label for="weight">Peso (kg)</label><input id="weight" type="number" min="35" max="250" value="70"></div>
+        <div class="field"><label for="height">Estatura (cm)</label><input id="height" type="number" min="120" max="230" value="170"></div>
+        <div class="field"><label for="age">Edad</label><input id="age" type="number" min="18" max="100" value="28"></div>
+        <div class="field"><label for="gender">Sexo para la ecuación</label><select id="gender"><option value="female">Mujer</option><option value="male">Hombre</option></select></div>
+        <div class="field" style="grid-column:1/-1"><label for="activity">Actividad física</label><select id="activity"><option value="1.2">Sedentario</option><option value="1.375" selected>Ligera · 1–3 días/semana</option><option value="1.55">Moderada · 3–5 días/semana</option><option value="1.725">Alta · 6–7 días/semana</option><option value="1.9">Muy alta</option></select></div>
+      </div><div class="metrics"><div class="metric"><small>Índice de masa corporal</small><strong id="bmi">24.2</strong><span class="hint" id="bmiLabel">Estimación</span></div><div class="metric"><small>Gasto diario estimado</small><strong id="calories">—</strong><span class="hint">kcal/día</span></div></div><p class="fineprint">Cifras aproximadas para adultos, no son diagnóstico ni prescripción médica.</p></div>
+    </div>
+  </section>
 
-    <title>Pomelo Brunch House — Eat Well, Feel Everything</title>
+  <section class="section" id="menu">
+    <div class="section-head"><div><div class="eyebrow">Made with intention</div><h2>El menú semanal.</h2></div><p>Selecciona un platillo para cada día que quieras incluir. Los platillos y precios se actualizan desde la administración.</p></div>
+    <div id="menuStatus" class="muted">Cargando menú…</div>
+    <div class="menu-days" id="menuDays"></div>
+  </section>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <section class="section" id="suscripcion">
+    <div class="section-head"><div><div class="eyebrow">Your week, sorted</div><h2>Arma tu solicitud.</h2></div><p>Déjanos tus datos para preparar tu pedido. Te contactaremos para confirmar los detalles.</p></div>
+    <div class="order-layout">
+      <form class="panel" id="orderForm">
+        <h3>Datos de entrega</h3>
+        <div class="field-grid">
+          <div class="field"><label for="customerName">Nombre completo *</label><input id="customerName" required maxlength="120" autocomplete="name"></div>
+          <div class="field"><label for="phone">WhatsApp *</label><input id="phone" required type="tel" maxlength="25" autocomplete="tel" placeholder="669 000 0000"></div>
+          <div class="field"><label for="diet">Preferencia alimentaria</label><select id="diet"><option>Balanceado</option><option>Keto</option><option>High Protein</option><option>Vegetariano</option></select></div>
+          <div class="field"><label for="zone">Zona de entrega *</label><select id="zone"><option>Centro Histórico / Olas Altas</option><option>Malecón / Zona Dorada</option><option>Marina / Cerritos</option></select></div>
+          <div class="field" style="grid-column:1/-1"><label for="address">Dirección completa *</label><input id="address" required maxlength="300" autocomplete="street-address"></div>
+          <div class="field" style="grid-column:1/-1"><label for="reference">Referencias de entrega</label><input id="reference" maxlength="300" placeholder="Edificio, color de puerta, etc."></div>
+          <div class="field" style="grid-column:1/-1"><label for="notes">Alergias o notas</label><textarea id="notes" maxlength="1000" placeholder="Indica alergias o consideraciones importantes"></textarea></div>
+        </div>
+        <label class="check-row"><input type="checkbox" id="consent" required><span>Autorizo el uso de mis datos para gestionar esta solicitud y coordinar la entrega. Entiendo que está sujeta a confirmación.</span></label>
+        <div id="formMessage" aria-live="polite"></div>
+        <button class="button full" id="submitBtn" type="submit">Solicitar mi menú ↗</button>
+        <p class="fineprint">Tu solicitud no confirma el pedido ni el pago. El equipo te contactará para confirmar.</p>
+      </form>
+      <aside class="panel summary">
+        <div class="eyebrow">Order summary</div><h3>Tu selección.</h3>
+        <div id="summaryRows"><p class="muted">Aún no has seleccionado platillos.</p></div>
+        <div class="summary-row summary-total"><span>Total estimado</span><strong id="orderTotal">$0 MXN</strong></div>
+        <p class="fineprint">El total final se confirma al revisar disponibilidad y entrega.</p>
+        <a class="button secondary full" href="#menu">Volver al menú ↑</a>
+      </aside>
+    </div>
+  </section>
+</div>
+</main>
 
-    <link
-      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap"
-      rel="stylesheet"
-    />
-  </head>
+<main id="loginView" class="hidden wrap">
+  <div class="login-card"><div class="eyebrow">Pomelo / Internal</div><h1>Chef's desk.</h1><p class="muted">Inicia sesión para administrar el menú y las solicitudes.</p>
+    <form id="loginForm"><div class="field"><label for="loginEmail">Correo</label><input id="loginEmail" type="email" required autocomplete="username"></div><div class="field"><label for="loginPassword">Contraseña</label><input id="loginPassword" type="password" required autocomplete="current-password"></div><div id="loginMessage" aria-live="polite"></div><button class="button full" type="submit">Iniciar sesión ↗</button><button class="button secondary full" style="margin-top:9px" type="button" id="backHome">Volver al sitio</button></form>
+  </div>
+</main>
 
-  <body>
-    <div id="root"></div>
+<main id="adminView" class="hidden">
+<div class="wrap admin-wrap">
+  <div class="admin-top"><div><div class="eyebrow">Pomelo / Operations</div><h1>Kitchen & delivery.</h1><p class="muted">Control de platillos, solicitudes y entregas.</p></div><div class="admin-actions"><button id="refreshAdmin">↻ Actualizar</button><button id="exportCsv">↓ Exportar CSV</button><button class="primary" id="logoutBtn">Cerrar sesión</button></div></div>
+  <div id="adminMessage" aria-live="polite"></div>
+  <div class="admin-stats"><div class="stat"><small>Solicitudes</small><strong id="statTotal">0</strong></div><div class="stat"><small>Activas</small><strong id="statActive">0</strong></div><div class="stat"><small>Total nominal</small><strong id="statRevenue">$0</strong></div><div class="stat"><small>Platillos</small><strong id="statMenu">0</strong></div></div>
+  <section class="admin-panel"><h2>Menu management.</h2><p class="muted">Crear y editar platillos. Marca los días en que está disponible.</p>
+    <form id="menuForm">
+      <input type="hidden" id="menuId">
+      <div class="admin-form">
+        <div class="field"><label for="menuName">Nombre del platillo *</label><input id="menuName" required maxlength="120"></div>
+        <div class="field"><label for="menuPrice">Precio (MXN) *</label><input id="menuPrice" type="number" min="0" step=".01" required></div>
+        <div class="field wide"><label for="menuDescription">Descripción</label><textarea id="menuDescription" maxlength="500"></textarea></div>
+        <div class="wide"><strong style="font-size:12px">Días disponibles</strong><div id="adminDays" class="check-row" style="flex-wrap:wrap"></div></div>
+        <label class="check-row wide"><input type="checkbox" id="menuActive" checked><span>Platillo visible para clientes</span></label>
+      </div>
+      <div class="admin-actions"><button class="primary" type="submit">Guardar platillo</button><button type="button" id="resetMenu">Cancelar edición</button></div>
+    </form>
+    <hr class="separator"><div id="adminMenuList"></div>
+  </section>
+  <section class="admin-panel"><h2>Subscription requests.</h2><div class="table-wrap"><table><thead><tr><th>Fecha / folio</th><th>Cliente</th><th>Pedido</th><th>Total</th><th>Estado</th><th>Activo</th></tr></thead><tbody id="ordersBody"><tr><td colspan="6">Cargando solicitudes…</td></tr></tbody></table></div></section>
+</div>
+</main>
+<footer class="footer"><div class="footer-inner"><div><div style="font:500 28px var(--serif)">Pomelo Brunch House</div><p>Comer bien, sin complicarlo. · Mazatlán, Sinaloa</p></div><button class="admin-link" id="footerAdmin">Acceso interno</button></div></footer>
 
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<script>
+/* CONFIGURACIÓN PÚBLICA DE SUPABASE.
+   La publishable/anon key está diseñada para usarse en el navegador.
+   La seguridad real depende de las políticas RLS de Supabase. */
+const SUPABASE_URL = 'https://nwjqtwhtnkknfbgzptpx.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_NuE2x0L-W14H3boJBIHNKQ_llE6Es63';
+const CHEF_WHATSAPP = '526690000000'; // Sustituir por el número real de Chef Iván.
+const DAYS = ['Lunes','Martes','Miércoles','Jueves','Viernes'];
+const supabaseClient = window.supabase?.createClient(SUPABASE_URL, SUPABASE_KEY);
+let menuItems = [];
+let selectedMeals = {};
+let currentSession = null;
+let orders = [];
+const $ = (id) => document.getElementById(id);
+const money = (v) => new Intl.NumberFormat('es-MX',{style:'currency',currency:'MXN',maximumFractionDigits:2}).format(Number(v)||0);
+const esc = (v) => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function message(id,text,error=false){$(id).innerHTML=text?`<div class="notice ${error?'error':''}">${esc(text)}</div>`:'';}
+function setView(view){$('clientView').classList.toggle('hidden',view!=='client');$('loginView').classList.toggle('hidden',view!=='login');$('adminView').classList.toggle('hidden',view!=='admin');window.scrollTo({top:0,behavior:'smooth'});}
+function total(){return Object.values(selectedMeals).reduce((sum,id)=>{const item=menuItems.find(x=>String(x.id)===String(id)&&x.active);return sum+(Number(item?.price_mxn)||0)},0);}
+function renderMenu(){
+  $('menuStatus').textContent = menuItems.filter(x=>x.active).length ? 'Selecciona un platillo por día. Puedes elegir solo los días que necesites.' : 'Todavía no hay platillos disponibles. Vuelve a consultar más tarde.';
+  $('menuDays').innerHTML = DAYS.map(day=>{
+    const available=menuItems.filter(item=>item.active&&(item.available_days||[]).includes(day));
+    return `<article class="day-card"><div class="day-head"><h3>${day}</h3><small>${selectedMeals[day]?'1 platillo seleccionado':'Elige una opción'}</small></div>${available.length?`<div class="dish-grid">${available.map(item=>`<div class="dish"><input type="radio" name="day-${day}" id="dish-${day}-${item.id}" value="${esc(item.id)}" ${String(selectedMeals[day]||'')===String(item.id)?'checked':''}><label for="dish-${day}-${item.id}"><span class="dish-name">${esc(item.name)}</span><span class="dish-desc">${esc(item.description||'Preparado con ingredientes frescos.')}</span><span class="dish-price">${money(item.price_mxn)}</span></label></div>`).join('')}</div>`:`<div class="dish-empty">Sin platillos disponibles para este día.</div>`}</article>`;
+  }).join('');
+  DAYS.forEach(day=>document.querySelectorAll(`input[name="day-${day}"]`).forEach(input=>input.addEventListener('change',()=>{selectedMeals[day]=input.value;renderMenu();renderSummary();}));
+  renderSummary();
+}
+function renderSummary(){
+ const rows=DAYS.filter(day=>selectedMeals[day]).map(day=>{const item=menuItems.find(x=>String(x.id)===String(selectedMeals[day]));return item?`<div class="summary-row"><span>${esc(day)} · ${esc(item.name)}</span><strong>${money(item.price_mxn)}</strong></div>`:''}).join('');
+ $('summaryRows').innerHTML=rows||'<p class="muted">Aún no has seleccionado platillos.</p>';
+ $('orderTotal').textContent=money(total())+' MXN';
+}
+async function loadMenu(){
+ if(!supabaseClient){$('menuStatus').textContent='No se pudo iniciar la conexión con el menú.';return;}
+ $('menuStatus').textContent='Cargando menú…';
+ const {data,error}=await supabaseClient.from('menu_items').select('*').order('name',{ascending:true});
+ if(error){console.error(error);$('menuStatus').textContent='No se pudo cargar el menú. Intenta actualizar la página.';return;}
+ menuItems=data||[];
+ for(const day of Object.keys(selectedMeals)){if(!menuItems.some(x=>String(x.id)===String(selectedMeals[day])&&x.active&&(x.available_days||[]).includes(day)))delete selectedMeals[day];}
+ renderMenu();
+}
+function makeWhatsAppMessage(order){
+ const lines=DAYS.filter(day=>selectedMeals[day]).map(day=>{const item=menuItems.find(x=>String(x.id)===String(selectedMeals[day]));return item?`• ${day}: ${item.name} — ${money(item.price_mxn)}`:''}).filter(Boolean);
+ return ['🍊 *POMELO BRUNCH HOUSE*','_Nueva solicitud para Chef Iván_','','*DATOS DEL CLIENTE*',`• Nombre: ${order.customer_name}`,`• WhatsApp: ${order.phone}`,`• Folio: ${order.id||'Pendiente'}`,'','*PLATILLOS POR DÍA*',...lines,'',`• Total estimado: ${money(order.price_mxn)} MXN`,'',`• Dieta: ${order.diet||'No especificada'}`,`• Alergias / notas: ${order.dietary_notes||'No especificadas'}`,`• Zona: ${order.delivery_zone}`,`• Dirección: ${order.address}`,`• Referencias: ${order.delivery_reference||'Sin referencias'}`,'','Confirmar disponibilidad, horario y pago.','Solicitud pendiente de confirmación.'].join('\n');
+}
+$('orderForm').addEventListener('submit',async e=>{
+ e.preventDefault();message('formMessage','');
+ if(!supabaseClient){message('formMessage','No se pudo conectar con el sistema de pedidos.',true);return;}
+ const digits=$('phone').value.replace(/\D/g,'');
+ if(digits.length<10||digits.length>15){message('formMessage','Introduce un número de WhatsApp válido.',true);return;}
+ const chosen=DAYS.filter(day=>selectedMeals[day]).map(day=>({day_of_week:day,menu_item_id:selectedMeals[day]}));
+ if(!chosen.length){message('formMessage','Selecciona al menos un día y un platillo.',true);return;}
+ const payload={customer_name:$('customerName').value.trim(),phone:$('phone').value.trim(),diet:$('diet').value,delivery_zone:$('zone').value,address:$('address').value.trim(),delivery_reference:$('reference').value.trim()||null,dietary_notes:$('notes').value.trim()||null};
+ const btn=$('submitBtn');btn.disabled=true;btn.textContent='Registrando solicitud…';
+ const whatsappWindow=window.open('about:blank','_blank');
+ try{
+  const {data:orderId,error}=await supabaseClient.rpc('create_custom_order',{p_order:payload,p_items:chosen});
+  if(error)throw error;
+  const saved={...payload,id:orderId,price_mxn:total()};
+  message('formMessage',`Solicitud registrada. Folio: ${String(orderId).slice(0,8).toUpperCase()}.`);
+  if(CHEF_WHATSAPP!=='526690000000'&&CHEF_WHATSAPP.replace(/\D/g,'').length>=10){
+   const url=`https://wa.me/${CHEF_WHATSAPP.replace(/\D/g,'')}?text=${encodeURIComponent(makeWhatsAppMessage(saved))}`;
+   if(whatsappWindow&&!whatsappWindow.closed)whatsappWindow.location.href=url;else window.location.href=url;
+  }else if(whatsappWindow&&!whatsappWindow.closed)whatsappWindow.close();
+  $('orderForm').reset();selectedMeals={};renderMenu();
+ }catch(err){console.error(err);if(whatsappWindow&&!whatsappWindow.closed)whatsappWindow.close();message('formMessage',err.message?.includes('no está disponible')?'Uno de los platillos ya no está disponible. Actualiza el menú.':'No se pudo registrar el pedido. Revisa la conexión y las políticas de Supabase.',true);}
+ finally{btn.disabled=false;btn.textContent='Solicitar mi menú ↗';}
+});
+function updateNutrition(){
+ const w=Number($('weight').value),h=Number($('height').value),age=Number($('age').value),gender=$('gender').value,activity=Number($('activity').value);
+ if(w>0&&h>0&&age>0){const bmi=w/((h/100)**2);$('bmi').textContent=bmi.toFixed(1);$('bmiLabel').textContent=bmi<18.5?'Bajo peso':bmi<25?'Rango convencional':bmi<30?'Sobrepeso':'Obesidad';const bmr=10*w+6.25*h-5*age+(gender==='male'?5:-161);$('calories').textContent=Math.round(bmr*activity).toLocaleString('es-MX');}
+}
+['weight','height','age','gender','activity'].forEach(id=>$(id).addEventListener('input',updateNutrition));updateNutrition();
+function showLogin(){setView('login');message('loginMessage','');}
+$('navAdmin').addEventListener('click',showLogin);$('footerAdmin').addEventListener('click',showLogin);$('backHome').addEventListener('click',()=>setView('client'));$('homeBtn').addEventListener('click',()=>setView('client'));
+$('loginForm').addEventListener('submit',async e=>{
+ e.preventDefault();message('loginMessage','');
+ if(!supabaseClient){message('loginMessage','No se pudo iniciar la conexión con Supabase.',true);return;}
+ const {error}=await supabaseClient.auth.signInWithPassword({email:$('loginEmail').value.trim(),password:$('loginPassword').value});
+ if(error){message('loginMessage','No se pudo iniciar sesión. Revisa tus credenciales.',true);return;}
+ $('loginPassword').value='';await checkSession();
+});
+async function checkSession(){
+ if(!supabaseClient)return;
+ const {data}=await supabaseClient.auth.getSession();currentSession=data.session||null;
+ if(currentSession){setView('admin');await loadAdmin();}else if(!$('loginView').classList.contains('hidden'))setView('login');
+}
+$('logoutBtn').addEventListener('click',async()=>{await supabaseClient.auth.signOut();currentSession=null;orders=[];setView('client');});
+$('refreshAdmin').addEventListener('click',loadAdmin);
+function statusOptions(current){return [['solicitud','Nueva solicitud'],['confirmada','Confirmada'],['en_preparacion','En preparación'],['lista','Lista para entrega'],['entregada','Entregada'],['cancelada','Cancelada']].map(([v,l])=>`<option value="${v}" ${current===v?'selected':''}>${l}</option>`).join('');}
+async function loadAdmin(){
+ if(!currentSession||!supabaseClient)return;
+ message('adminMessage','Cargando información…');
+ const [menuRes,ordersRes]=await Promise.all([
+  supabaseClient.from('menu_items').select('*').order('name',{ascending:true}),
+  supabaseClient.from('subscriptions').select('*, subscription_items(*)').order('created_at',{ascending:false})
+ ]);
+ if(menuRes.error||ordersRes.error){message('adminMessage','No se pudo cargar el administrador. Revisa permisos y tablas en Supabase.',true);console.error(menuRes.error,ordersRes.error);return;}
+ menuItems=menuRes.data||[];orders=ordersRes.data||[];
+ $('statTotal').textContent=orders.length;
+ $('statActive').textContent=orders.filter(o=>o.active&&o.status!=='cancelada').length;
+ $('statRevenue').textContent=money(orders.filter(o=>o.active&&o.status!=='cancelada').reduce((s,o)=>s+Number(o.price_mxn||0),0));
+ $('statMenu').textContent=menuItems.length;
+ renderAdminMenu();renderOrders();renderMenu();message('adminMessage','');
+}
+function renderAdminMenu(){
+ $('adminDays').innerHTML=DAYS.map(day=>`<label class="check-row"><input type="checkbox" name="adminDay" value="${day}"><span>${day}</span></label>`).join('');
+ $('adminMenuList').innerHTML=menuItems.map(item=>`<div class="summary-row"><span><strong>${esc(item.name)}</strong><br><span class="muted">${money(item.price_mxn)} · ${esc((item.available_days||[]).join(', '))} · ${item.active?'Visible':'Desactivado'}</span><br><span class="muted">${esc(item.description||'Sin descripción')}</span></span><span><button class="small-btn" data-edit="${esc(item.id)}">Editar</button> <button class="small-btn" data-toggle="${esc(item.id)}">${item.active?'Desactivar':'Activar'}</button></span></div>`).join('')||'<p class="muted">Todavía no hay platillos.</p>';
+ $('adminMenuList').querySelectorAll('[data-edit]').forEach(btn=>btn.addEventListener('click',()=>editMenu(menuItems.find(x=>String(x.id)===btn.dataset.edit))));
+ $('adminMenuList').querySelectorAll('[data-toggle]').forEach(btn=>btn.addEventListener('click',()=>toggleMenu(menuItems.find(x=>String(x.id)===btn.dataset.toggle))));
+}
+function editMenu(item){
+ if(!item)return;
+ $('menuId').value=item.id;$('menuName').value=item.name;$('menuPrice').value=item.price_mxn;$('menuDescription').value=item.description||'';$('menuActive').checked=Boolean(item.active);
+ document.querySelectorAll('input[name="adminDay"]').forEach(input=>input.checked=(item.available_days||[]).includes(input.value));
+ $('menuForm').scrollIntoView({behavior:'smooth',block:'center'});
+}
+function resetMenuForm(){
+ $('menuForm').reset();$('menuId').value='';$('menuActive').checked=true;
+}
+$('resetMenu').addEventListener('click',resetMenuForm);
+$('menuForm').addEventListener('submit',async e=>{
+ e.preventDefault();if(!currentSession)return;
+ const days=[...document.querySelectorAll('input[name="adminDay"]:checked')].map(x=>x.value);
+ if(!days.length){message('adminMessage','Selecciona al menos un día disponible.',true);return;}
+ const payload={name:$('menuName').value.trim(),price_mxn:Number($('menuPrice').value),description:$('menuDescription').value.trim()||null,available_days:days,active:$('menuActive').checked,updated_at:new Date().toISOString()};
+ const id=$('menuId').value;
+ const query=id?supabaseClient.from('menu_items').update(payload).eq('id',id):supabaseClient.from('menu_items').insert(payload);
+ const {error}=await query;
+ if(error){message('adminMessage','No se pudo guardar el platillo. Revisa las políticas de Supabase.',true);console.error(error);return;}
+ resetMenuForm();await loadAdmin();message('adminMessage','Menú actualizado correctamente.');
+});
+async function toggleMenu(item){
+ if(!item||!currentSession)return;
+ const {error}=await supabaseClient.from('menu_items').update({active:!item.active,updated_at:new Date().toISOString()}).eq('id',item.id);
+ if(error){message('adminMessage','No se pudo cambiar la disponibilidad.',true);return;}await loadAdmin();
+}
+function renderOrders(){
+ $('ordersBody').innerHTML=orders.map(order=>{
+ const items=order.subscription_items||[];
+ const details=items.length?items.map(i=>`${esc(i.day_of_week||'')} · ${esc(i.meal_name||i.name||'Platillo')}`).join('<br>'):`${esc(order.plan||'Solicitud')}`;
+ return `<tr><td>${new Date(order.created_at).toLocaleString('es-MX')}<br><span class="muted">${esc(String(order.id).slice(0,8))}</span></td><td><strong>${esc(order.customer_name)}</strong><br>${esc(order.phone)}<br><span class="muted">${esc(order.address)}</span></td><td>${details}<br><span class="muted">${esc(order.delivery_zone||'')}</span></td><td>${money(order.price_mxn)}</td><td><select data-status="${esc(order.id)}">${statusOptions(order.status)}</select></td><td><input type="checkbox" data-active="${esc(order.id)}" ${order.active?'checked':''} aria-label="Suscripción activa"></td></tr>`;
+ }).join('')||'<tr><td colspan="6">No hay solicitudes registradas.</td></tr>';
+ $('ordersBody').querySelectorAll('[data-status]').forEach(sel=>sel.addEventListener('change',async()=>{const {error}=await supabaseClient.from('subscriptions').update({status:sel.value}).eq('id',sel.dataset.status);if(error){message('adminMessage','No se pudo actualizar el estado.',true);return;}await loadAdmin();}));
+ $('ordersBody').querySelectorAll('[data-active]').forEach(input=>input.addEventListener('change',async()=>{const {error}=await supabaseClient.from('subscriptions').update({active:input.checked}).eq('id',input.dataset.active);if(error){message('adminMessage','No se pudo cambiar el estado activo.',true);return;}await loadAdmin();}));
+}
+$('exportCsv').addEventListener('click',()=>{
+ const headers=['Folio','Fecha','Cliente','WhatsApp','Plan','Precio MXN','Dieta','Zona','Dirección','Referencias','Notas','Estado','Activo'];
+ const rows=orders.map(o=>[o.id,o.created_at,o.customer_name,o.phone,o.plan,o.price_mxn,o.diet,o.delivery_zone,o.address,o.delivery_reference||'',o.dietary_notes||'',o.status,o.active?'Sí':'No']);
+ const cell=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
+ const csv='\uFEFF'+[headers,...rows].map(row=>row.map(cell).join(',')).join('\r\n');
+ const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));const a=document.createElement('a');a.href=url;a.download=`pomelo-suscripciones-${new Date().toISOString().slice(0,10)}.csv`;a.click();URL.revokeObjectURL(url);
+});
+if(supabaseClient){
+ supabaseClient.auth.onAuthStateChange((_event,session)=>{currentSession=session;if(session){setView('admin');loadAdmin();}});
+ loadMenu();checkSession();
+}else{
+ $('menuStatus').textContent='No se pudo iniciar la conexión con Supabase.';
+}
+</script>
+</body>
 </html>

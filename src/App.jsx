@@ -1171,99 +1171,93 @@ async function submitSubscription(event) {
               </p>
             </div>
 
-            <div className="plans">
-              {Object.entries(PLANS).map(([key, item]) => (
-                <article
-                  key={key}
-                  className={`plan-card ${plan === key ? 'selected' : ''}`}
-                >
-                  <div className="plan-tag">
-                    {key === 'semanal' ? '01 / Flexibilidad' : '02 / Best value'}
-                  </div>
 
-                  <h3>{item.name}</h3>
+<div className="form-section-title">02 — Elige tus comidas</div>
 
-                  <div className="plan-price">
-                    {money(item.price)} <small>MXN</small>
-                  </div>
+<p className="field-hint">
+  Selecciona los días que quieras. Cada día seleccionado requiere un platillo.
+</p>
 
-                  <p className="plan-period">
-                    {key === 'semanal'
-                      ? 'Por semana · 5 días de comida'
-                      : 'Por mes · 20 días de comida'}
-                  </p>
+{menuLoading && <p>Cargando menú...</p>}
 
-                  <ul className="plan-features">
-                    <li>Servicio de lunes a viernes</li>
-                    <li>Preferencia de dieta a elegir</li>
-                    <li>Coordinación de entrega</li>
-                  </ul>
+{menuError && (
+  <div className="alert alert-error" role="alert">
+    {menuError}
+  </div>
+)}
 
-                  <button
-                    className="select-plan"
-                    onClick={() => setPlan(key)}
-                  >
-                    {plan === key ? '✓ Plan seleccionado' : 'Elegir este plan'}
-                  </button>
-                </article>
+<div className="meal-day-grid">
+  {WEEK_DAYS.map((day) => {
+    const selected = Boolean(selectedMeals[day]);
+    const availableItems = menuItems.filter(
+      (item) =>
+        item.active &&
+        (item.available_days || []).includes(day)
+    );
+
+    return (
+      <article className={`meal-day-card ${selected ? 'selected' : ''}`} key={day}>
+        <label className="meal-day-toggle">
+          <input
+            type="checkbox"
+            checked={selected}
+            onChange={(event) => {
+              setSelectedMeals((previous) => {
+                const next = { ...previous };
+
+                if (event.target.checked) {
+                  next[day] = '';
+                } else {
+                  delete next[day];
+                }
+
+                return next;
+              });
+            }}
+          />
+          <strong>{day}</strong>
+        </label>
+
+        {selected && (
+          <div className="field">
+            <label htmlFor={`meal-${day}`}>Platillo para {day}</label>
+
+            <select
+              id={`meal-${day}`}
+              value={selectedMeals[day] || ''}
+              onChange={(event) =>
+                setSelectedMeals((previous) => ({
+                  ...previous,
+                  [day]: event.target.value
+                }))
+              }
+              required
+            >
+              <option value="">Selecciona un platillo</option>
+              {availableItems.map((item) => (
+                <option key={item.id} value={item.id}>
+                  {item.name} — {money(item.price_mxn)}
+                </option>
               ))}
-            </div>
+            </select>
 
-            <div className="form-shell">
-              <div className="form-header">
-                <div>
-                  <h3>Let's make it personal.</h3>
-                  <p>Cuéntanos un poco de ti. Nosotros nos ocupamos del resto.</p>
-                </div>
-                <span className="step-label">YOUR SUBSCRIPTION / 01</span>
-              </div>
+            {availableItems.length === 0 && (
+              <span className="field-hint">
+                No hay platillos disponibles para este día.
+              </span>
+            )}
+          </div>
+        )}
 
-              <form onSubmit={submitSubscription}>
-                <div className="form-section-title">01 — Tus datos</div>
+        {!selected && (
+          <p className="field-hint">Selecciona para agregar una comida.</p>
+        )}
+      </article>
+    );
+  })}
+</div>
 
-                <div className="form-grid">
-                  <Field label="Nombre completo *" full>
-                    <input
-                      name="customer_name"
-                      value={form.customer_name}
-                      onChange={updateForm}
-                      minLength={2}
-                      maxLength={100}
-                      autoComplete="name"
-                      placeholder="¿Cómo te llamas?"
-                      required
-                    />
-                  </Field>
-
-                  <Field label="WhatsApp *">
-                    <input
-                      name="phone"
-                      value={form.phone}
-                      onChange={updateForm}
-                      type="tel"
-                      inputMode="tel"
-                      maxLength={20}
-                      autoComplete="tel"
-                      placeholder="669 000 0000"
-                      required
-                    />
-                    <span className="field-hint">
-                      Incluye tu clave de país si tu número es extranjero.
-                    </span>
-                  </Field>
-
-                  <Field label="Duración del plan *">
-                    <select value={plan} onChange={(event) => setPlan(event.target.value)}>
-                      {Object.entries(PLANS).map(([key, item]) => (
-                        <option key={key} value={key}>
-                          {item.label} — {money(item.price)} MXN
-                        </option>
-                      ))}
-                    </select>
-                  </Field>
-                </div>
-
-                <div className="form-section-title">02 — Your kind of food</div>
+<div className="form-section-title">03 — Your kind of food</div>
 
                 <div className="form-grid">
                   <Field label="Preferencia alimenticia *" full>

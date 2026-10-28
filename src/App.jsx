@@ -615,19 +615,26 @@ export default function App() {
       active: true
     };
 
-    // Abrir una ventana durante el gesto del usuario reduce
-    // la posibilidad de que el navegador bloquee WhatsApp
-    // después de esperar la respuesta de Supabase.
+    // Abrir una ventana durante el gesto del usuario ayuda
+    // a evitar que el navegador bloquee WhatsApp.
     const whatsappWindow = window.open('about:blank', '_blank');
 
     setSubmitting(true);
 
     try {
-      const { data, error } = await supabase
+      // Generar el folio antes de insertar el registro.
+      const orderId = crypto.randomUUID();
+
+      const payloadWithId = {
+        ...payload,
+        id: orderId
+      };
+
+      // Insertar sin .select(), para no exigir permiso SELECT
+      // a los visitantes que envían una solicitud.
+      const { error } = await supabase
         .from('subscriptions')
-        .insert(payload)
-        .select('id, created_at')
-        .single();
+        .insert(payloadWithId);
 
       if (error) {
         if (whatsappWindow && !whatsappWindow.closed) {
@@ -639,25 +646,27 @@ export default function App() {
         setFormError(
           'No se pudo registrar tu solicitud. Verifica tu conexión e inténtalo de nuevo.'
         );
+
         return;
       }
 
       const savedOrder = {
-        ...payload,
-        id: data.id,
-        created_at: data.created_at
+        ...payloadWithId,
+        created_at: new Date().toISOString()
       };
 
       setFormSuccess(
-        `Solicitud registrada correctamente. Folio: ${data.id.slice(0, 8).toUpperCase()}.`
+        `Solicitud registrada correctamente. Folio: ${orderId
+          .slice(0, 8)
+          .toUpperCase()}.`
       );
 
       const message = makeWhatsAppMessage(savedOrder);
-      const phone = normalizePhone(CHEF_WHATSAPP);
+      const chefPhone = normalizePhone(CHEF_WHATSAPP);
 
-      if (phone && phone !== '526690000000') {
+      if (chefPhone && chefPhone !== '526690000000') {
         const whatsappUrl =
-          `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+          `https://wa.me/${chefPhone}?text=${encodeURIComponent(message)}`;
 
         if (whatsappWindow && !whatsappWindow.closed) {
           whatsappWindow.location.href = whatsappUrl;
@@ -670,7 +679,7 @@ export default function App() {
         }
 
         setFormSuccess(
-          'Solicitud registrada. Configura el número del chef para activar el enlace de WhatsApp.'
+          'Solicitud registrada. Configura el número real del chef para activar WhatsApp.'
         );
       }
 
@@ -690,13 +699,15 @@ export default function App() {
         whatsappWindow.close();
       }
 
-      console.error(error);
-      setFormError('Ocurrió un error inesperado al registrar la solicitud.');
+      console.error('Error al registrar la solicitud:', error);
+
+      setFormError(
+        'Ocurrió un error inesperado al registrar la solicitud.'
+      );
     } finally {
       setSubmitting(false);
     }
   }
-
   /* -------------------------------------------------------
      AUTENTICACIÓN
      ------------------------------------------------------- */

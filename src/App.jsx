@@ -443,28 +443,73 @@ export default function App() {
     setOrdersError('');
 
     const { data, error } = await supabase
-      .from('subscriptions')
-      .select('*')
-      .order('created_at', { ascending: false });
+    const orderId = crypto.randomUUID();
 
-    if (error) {
-      setOrdersError(
-        'No fue posible cargar los pedidos. Revisa la sesión y las políticas RLS.'
-      );
-    } else {
-      setOrders(data || []);
-    }
+const payloadWithId = {
+  ...payload,
+  id: orderId
+};
 
-    setOrdersLoading(false);
-  }, [session]);
+const { error } = await supabase
+  .from('subscriptions')
+  .insert(payloadWithId);
 
-  useEffect(() => {
-    if (!session || !supabase) {
-      setOrders([]);
-      return;
-    }
+if (error) {
+  if (whatsappWindow && !whatsappWindow.closed) {
+    whatsappWindow.close();
+  }
 
-    loadOrders();
+  console.error('Supabase insert error:', error);
+
+  setFormError(
+    'No se pudo registrar tu solicitud. Verifica tu conexión e inténtalo de nuevo.'
+  );
+
+  return;
+}
+
+const savedOrder = {
+  ...payloadWithId,
+  created_at: new Date().toISOString()
+};
+
+setFormSuccess(
+  `Solicitud registrada correctamente. Folio: ${orderId.slice(0, 8).toUpperCase()}.`
+);
+
+const message = makeWhatsAppMessage(savedOrder);
+const phone = normalizePhone(CHEF_WHATSAPP);
+
+if (phone && phone !== '526690000000') {
+  const whatsappUrl =
+    `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+
+  if (whatsappWindow && !whatsappWindow.closed) {
+    whatsappWindow.location.href = whatsappUrl;
+  } else {
+    window.location.href = whatsappUrl;
+  }
+} else {
+  if (whatsappWindow && !whatsappWindow.closed) {
+    whatsappWindow.close();
+  }
+
+  setFormSuccess(
+    'Solicitud registrada. Configura el número del chef para activar WhatsApp.'
+  );
+}
+
+setForm({
+  customer_name: '',
+  phone: '',
+  diet: 'Balanceado',
+  delivery_zone: ZONES[0],
+  address: '',
+  delivery_reference: '',
+  dietary_notes: ''
+});
+
+setPlan('semanal');
 
     const channel = supabase
       .channel('pomelo-subscriptions-live')

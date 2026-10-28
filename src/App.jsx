@@ -433,7 +433,7 @@ export default function App() {
   }, []);
 
   /* -------------------------------------------------------
-     CONSULTA DE PEDIDOS
+     CONSULTA DE PEDIDOS Y ACTUALIZACIONES EN TIEMPO REAL
      ------------------------------------------------------- */
 
   const loadOrders = useCallback(async () => {
@@ -442,74 +442,34 @@ export default function App() {
     setOrdersLoading(true);
     setOrdersError('');
 
-    const { data, error } = await supabase
-    const orderId = crypto.randomUUID();
+    try {
+      const { data, error } = await supabase
+        .from('subscriptions')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-const payloadWithId = {
-  ...payload,
-  id: orderId
-};
+      if (error) {
+        console.error('Error al cargar pedidos:', error);
+        setOrdersError('No se pudieron cargar las suscripciones.');
+        return;
+      }
 
-const { error } = await supabase
-  .from('subscriptions')
-  .insert(payloadWithId);
+      setOrders(data || []);
+    } catch (error) {
+      console.error(error);
+      setOrdersError('Ocurrió un error al consultar los pedidos.');
+    } finally {
+      setOrdersLoading(false);
+    }
+  }, [session]);
 
-if (error) {
-  if (whatsappWindow && !whatsappWindow.closed) {
-    whatsappWindow.close();
-  }
+  useEffect(() => {
+    if (!supabase || !session) {
+      setOrders([]);
+      return;
+    }
 
-  console.error('Supabase insert error:', error);
-
-  setFormError(
-    'No se pudo registrar tu solicitud. Verifica tu conexión e inténtalo de nuevo.'
-  );
-
-  return;
-}
-
-const savedOrder = {
-  ...payloadWithId,
-  created_at: new Date().toISOString()
-};
-
-setFormSuccess(
-  `Solicitud registrada correctamente. Folio: ${orderId.slice(0, 8).toUpperCase()}.`
-);
-
-const message = makeWhatsAppMessage(savedOrder);
-const phone = normalizePhone(CHEF_WHATSAPP);
-
-if (phone && phone !== '526690000000') {
-  const whatsappUrl =
-    `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
-
-  if (whatsappWindow && !whatsappWindow.closed) {
-    whatsappWindow.location.href = whatsappUrl;
-  } else {
-    window.location.href = whatsappUrl;
-  }
-} else {
-  if (whatsappWindow && !whatsappWindow.closed) {
-    whatsappWindow.close();
-  }
-
-  setFormSuccess(
-    'Solicitud registrada. Configura el número del chef para activar WhatsApp.'
-  );
-}
-
-setForm({
-  customer_name: '',
-  phone: '',
-  diet: 'Balanceado',
-  delivery_zone: ZONES[0],
-  address: '',
-  delivery_reference: '',
-  dietary_notes: ''
-});
-
-setPlan('semanal');
+    loadOrders();
 
     const channel = supabase
       .channel('pomelo-subscriptions-live')
@@ -530,7 +490,6 @@ setPlan('semanal');
       supabase.removeChannel(channel);
     };
   }, [session, loadOrders]);
-
   /* -------------------------------------------------------
      MÉTRICAS DE OPERACIÓN
      ------------------------------------------------------- */

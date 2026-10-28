@@ -171,3 +171,95 @@ export default function App() {
               <select 
                 style={{ width: '100%', padding: '12px', marginTop: '5px', borderRadius: '8px', border: '1px solid #ddd', background: '#fff' }}
                 value={formData.delivery_zone}
+                onChange={e => setFormData({...formData, delivery_zone: e.target.value})}
+              >
+                <option value="Centro Histórico / Olas Altas">Centro Histórico / Olas Altas</option>
+                <option value="Malecón / Zona Dorada">Malecón / Zona Dorada</option>
+                <option value="Marina Mazatlán / Cerritos">Marina Mazatlán / Cerritos</option>
+                <option value="Plazuela Machado / Centro">Plazuela Machado / Centro</option>
+              </select>
+            </label>
+
+            <label>
+              <strong>Dirección Completa (Calle, Núm, Colonia):</strong>
+              <input 
+                type="text" 
+                required 
+                placeholder="Ej. Av. del Mar #123, Col. Centro"
+                style={{ width: '100%', padding: '12px', marginTop: '5px', borderRadius: '8px', border: '1px solid #ddd', boxSizing: 'border-box' }} 
+                value={formData.delivery_address}
+                onChange={e => setFormData({...formData, delivery_address: e.target.value})}
+              />
+            </label>
+
+            <label>
+              <strong>Horario de Entrega (Lunes a Viernes):</strong>
+              <select 
+                style={{ width: '100%', padding: '12px', marginTop: '5px', borderRadius: '8px', border: '1px solid #ddd', background: '#fff' }}
+                value={formData.delivery_time_slot}
+                onChange={e => setFormData({...formData, delivery_time_slot: e.target.value})}
+              >
+                <option value="07:30 AM - 08:30 AM">07:30 AM - 08:30 AM (Mañanero)</option>
+                <option value="08:30 AM - 09:30 AM">08:30 AM - 09:30 AM (Estándar)</option>
+              </select>
+            </label>
+
+            <button 
+              type="submit" 
+              style={{ marginTop: '10px', padding: '14px', backgroundColor: '#E05A47', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer' }}
+            >
+              Confirmar Suscripción (L-V)
+            </button>
+          </form>
+        </main>
+      )}
+
+      {/* VISTA PANEL DEL CHEF */}
+      {view === 'admin' && (
+        <main style={{ maxWidth: '900px', margin: '0 auto', background: '#fff', padding: '30px', borderRadius: '16px', boxShadow: '0 4px 12px rgba(0,0,0,0.04)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+            <h2 style={{ color: '#2E5B44', margin: 0 }}>Panel de Operación del Chef (Producción L-V)</h2>
+            <button 
+              onClick={fetchSubscriptions}
+              style={{ padding: '8px 12px', background: '#eee', border: 'none', borderRadius: '6px', cursor: 'pointer' }}
+            >
+              🔄 Actualizar
+            </button>
+          </div>
+          <p style={{ color: '#666', marginBottom: '20px' }}>Control de clientes activos, dietas y rutas de entrega partiendo desde las espaldas de Ley del Mar.</p>
+
+          {loading ? (
+            <p>Cargando registros...</p>
+          ) : subscriptions.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '40px', background: '#FAF7F2', borderRadius: '12px', color: '#666' }}>
+              <p>No hay suscripciones registradas todavía o Supabase está pendiente de conectar.</p>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+              {subscriptions.map((sub) => (
+                <div key={sub.id} style={{ padding: '15px 20px', border: '1px solid #eee', borderRadius: '10px', background: '#FAF7F2', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <h3 style={{ margin: '0 0 5px 0', color: '#2E5B44' }}>{sub.client_name}</h3>
+                    <p style={{ margin: '0 0 5px 0', fontSize: '14px', color: '#555' }}>
+                      📞 {sub.client_phone} | 📍 <strong>{sub.delivery_zone}</strong> ({sub.delivery_address})
+                    </p>
+                    <p style={{ margin: 0, fontSize: '13px', color: '#777' }}>
+                      Plan: {sub.plan_duration.toUpperCase()} | Dieta: {sub.dietary_pref} | Horario: {sub.delivery_time_slot}
+                    </p>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <span style={{ display: 'inline-block', padding: '5px 10px', background: '#2E5B44', color: '#fff', borderRadius: '20px', fontSize: '12px', fontWeight: 'bold' }}>
+                      {sub.status}
+                    </span>
+                    <p style={{ margin: '5px 0 0 0', fontWeight: 'bold', color: '#E05A47' }}>${sub.total_price} MXN</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </main>
+      )}
+
+    </div>
+  );
+}

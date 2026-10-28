@@ -44,6 +44,7 @@ const DIETS = [
   'Keto',
   'High Protein',
   'Vegetariano'
+   ];
    
 const WEEK_DAYS = [
   'Lunes',

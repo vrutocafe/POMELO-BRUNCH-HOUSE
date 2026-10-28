@@ -44,6 +44,13 @@ const DIETS = [
   'Keto',
   'High Protein',
   'Vegetariano'
+   
+const WEEK_DAYS = [
+  'Lunes',
+  'Martes',
+  'Miércoles',
+  'Jueves',
+  'Viernes',
 ];
 
 const STATUSES = [
@@ -89,27 +96,37 @@ function initials(value) {
     .toUpperCase();
 }
 
+
 function makeWhatsAppMessage(order) {
-  const plan = PLANS[order.plan];
+  const items = order.selected_items || [];
+
+  const mealLines = items.length
+    ? items.map((item) =>
+        `• ${item.day_of_week}: ${item.meal_name} — ${money(item.unit_price_mxn)}`
+      )
+    : [
+        `• Plan anterior: ${PLANS[order.plan]?.name || order.plan || 'Sin detalle'}`,
+        `• Precio registrado: ${money(order.price_mxn)}`
+      ];
 
   return [
     '🍊 *POMELO BRUNCH HOUSE*',
-    '_Nueva solicitud para Chef Iván_',
+    '_Nuevo pedido para Chef Iván_',
     '',
     '━━━━━━━━━━━━━━━━━━',
     '*DATOS DEL CLIENTE*',
     `• Nombre: ${order.customer_name}`,
     `• WhatsApp: ${order.phone}`,
-    '',
-    '*SUSCRIPCIÓN*',
     `• Folio: ${order.id || 'Pendiente'}`,
-    `• Plan: ${plan?.name || order.plan}`,
-    `• Duración: ${plan?.duration || 'Por confirmar'}`,
-    `• Precio: ${money(order.price_mxn)} MXN`,
-    '• Servicio: lunes a viernes',
     '',
-    '*PREFERENCIAS DE COCINA*',
-    `• Dieta: ${order.diet}`,
+    '*PLATILLOS POR DÍA*',
+    ...mealLines,
+    '',
+    `• Cantidad de comidas: ${items.length || 'Plan anterior'}`,
+    `• TOTAL: ${money(order.price_mxn)} MXN`,
+    '',
+    '*PREFERENCIAS*',
+    `• Dieta: ${order.diet || 'No especificada'}`,
     `• Alergias / notas: ${order.dietary_notes || 'No especificadas'}`,
     '',
     '*ENTREGA*',
@@ -117,10 +134,8 @@ function makeWhatsAppMessage(order) {
     `• Dirección: ${order.address}`,
     `• Referencias: ${order.delivery_reference || 'Sin referencias'}`,
     '',
-    '• Punto de salida: espaldas de Ley del Mar, Mazatlán',
-    '',
-    'Confirmar disponibilidad, horario, condiciones de entrega y pago.',
-    'Este mensaje corresponde a una solicitud pendiente de confirmación.'
+    'Confirmar disponibilidad, horario y pago.',
+    'Solicitud pendiente de confirmación.'
   ].join('\n');
 }
 
@@ -359,6 +374,160 @@ function Slider({ label, value, min, max, step, unit, onChange }) {
    ========================================================= */
 
 export default function App() {
+   
+const [menuItems, setMenuItems] = useState([]);
+const [selectedMeals, setSelectedMeals] = useState({});
+const [menuLoading, setMenuLoading] = useState(false);
+const [menuError, setMenuError] = useState('');
+const [menuNotice, setMenuNotice] = useState('');
+
+const [menuDraft, setMenuDraft] = useState({
+  id: '',
+  name: '',
+  description: '',
+  price_mxn: '',
+  available_days: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'],
+  active: true
+});
+
+const selectedMealRows = WEEK_DAYS
+  .filter((day) => selectedMeals[day])
+  .map((day) => {
+    const item = menuItems.find(
+      (menuItem) => menuItem.id === selectedMeals[day] && menuItem.active
+    );
+
+    return item ? { day_of_week: day, menu_item_id: item.id, item } : null;
+  })
+  .filter(Boolean);
+
+const orderTotal = selectedMealRows.reduce(
+  (sum, row) => sum + Number(row.item.price_mxn || 0),
+  0
+);
+
+const loadMenu = useCallback(async () => {
+  if (!supabase) return;
+
+  setMenuLoading(true);
+  setMenuError('');
+
+  const { data, error } = await supabase
+    .from('menu_items')
+    .select('*')
+    .order('name', { ascending: true });
+
+  if (error) {
+    console.error('Error al cargar menú:', error);
+    setMenuError('No se pudo cargar el menú. Intenta actualizar la página.');
+  } else {
+    setMenuItems(data || []);
+  }
+
+  setMenuLoading(false);
+}, []);
+
+useEffect(() => {
+  loadMenu();
+}, [loadMenu]);
+   
+function resetMenuDraft() {
+  setMenuDraft({
+    id: '',
+    name: '',
+    description: '',
+    price_mxn: '',
+    available_days: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'],
+    active: true
+  });
+}
+
+async function saveMenuItem(event) {
+  event.preventDefault();
+  setMenuError('');
+  setMenuNotice('');
+
+  if (!session || !supabase) {
+    setMenuError('Inicia sesión para modificar el menú.');
+    return;
+  }
+
+  const name = menuDraft.name.trim();
+  const price = Number(menuDraft.price_mxn);
+
+  if (!name || !Number.isFinite(price) || price < 0) {
+    setMenuError('Escribe un nombre y un precio válido.');
+    return;
+  }
+
+  if (menuDraft.available_days.length === 0) {
+    setMenuError('Selecciona al menos un día de disponibilidad.');
+    return;
+  }
+
+  const payload = {
+    name,
+    description: menuDraft.description.trim() || null,
+    price_mxn: price,
+    available_days: menuDraft.available_days,
+    active: Boolean(menuDraft.active),
+    updated_at: new Date().toISOString()
+  };
+
+  const query = menuDraft.id
+    ? supabase.from('menu_items').update(payload).eq('id', menuDraft.id)
+    : supabase.from('menu_items').insert(payload);
+
+  const { error } = await query;
+
+  if (error) {
+    console.error('Error al guardar platillo:', error);
+    setMenuError('No se pudo guardar el platillo. Revisa los datos e inténtalo de nuevo.');
+    return;
+  }
+
+  resetMenuDraft();
+  await loadMenu();
+  setMenuNotice('Menú actualizado correctamente.');
+}
+
+function editMenuItem(item) {
+  setMenuDraft({
+    id: item.id,
+    name: item.name,
+    description: item.description || '',
+    price_mxn: String(item.price_mxn),
+    available_days: item.available_days || [],
+    active: item.active
+  });
+
+  document.getElementById('menu-management')?.scrollIntoView({
+    behavior: 'smooth'
+  });
+}
+
+async function toggleMenuItem(item) {
+  if (!session || !supabase) return;
+
+  const { error } = await supabase
+    .from('menu_items')
+    .update({
+      active: !item.active,
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', item.id);
+
+  if (error) {
+    setMenuError('No se pudo cambiar la disponibilidad del platillo.');
+    return;
+  }
+
+  setMenuNotice(
+    item.active ? 'Platillo desactivado.' : 'Platillo activado.'
+  );
+  await loadMenu();
+}
+
   const [view, setView] = useState('cliente');
   const [session, setSession] = useState(null);
   const [authReady, setAuthReady] = useState(false);
@@ -569,145 +738,137 @@ export default function App() {
     }));
   }
 
-  async function submitSubscription(event) {
-    event.preventDefault();
 
-    setFormError('');
-    setFormSuccess('');
+async function submitSubscription(event) {
+  event.preventDefault();
+  setFormError('');
+  setFormSuccess('');
 
-    if (!supabase) {
-      setFormError(
-        'La conexión con Supabase no está configurada. Revisa las variables de entorno.'
-      );
-      return;
-    }
+  if (!supabase) {
+    setFormError('La conexión con Supabase no está configurada.');
+    return;
+  }
 
-    const phoneDigits = normalizePhone(form.phone);
+  const phoneDigits = normalizePhone(form.phone);
 
-    if (phoneDigits.length < 10 || phoneDigits.length > 15) {
-      setFormError('Introduce un número de WhatsApp válido.');
-      return;
-    }
+  if (phoneDigits.length < 10 || phoneDigits.length > 15) {
+    setFormError('Introduce un número de WhatsApp válido.');
+    return;
+  }
 
-    if (!form.customer_name.trim() || !form.address.trim()) {
-      setFormError('Completa tu nombre y tu dirección.');
-      return;
-    }
+  if (!form.customer_name.trim() || !form.address.trim()) {
+    setFormError('Completa tu nombre y tu dirección.');
+    return;
+  }
 
-    const validPlan = PLANS[plan];
+  if (selectedMealRows.length === 0) {
+    setFormError('Selecciona al menos un día y un platillo.');
+    return;
+  }
 
-    if (!validPlan) {
-      setFormError('Selecciona un plan válido.');
-      return;
-    }
+  const payload = {
+    customer_name: form.customer_name.trim(),
+    phone: form.phone.trim(),
+    diet: form.diet,
+    delivery_zone: form.delivery_zone,
+    address: form.address.trim(),
+    delivery_reference: form.delivery_reference.trim() || null,
+    dietary_notes: form.dietary_notes.trim() || null
+  };
 
-    const payload = {
-      customer_name: form.customer_name.trim(),
-      phone: form.phone.trim(),
-      plan,
-      price_mxn: validPlan.price,
-      diet: form.diet,
-      delivery_zone: form.delivery_zone,
-      address: form.address.trim(),
-      delivery_reference: form.delivery_reference.trim() || null,
-      dietary_notes: form.dietary_notes.trim() || null,
-      status: 'solicitud',
-      active: true
-    };
+  // Abrir durante el clic para reducir bloqueos del navegador.
+  const whatsappWindow = window.open('about:blank', '_blank');
 
-    // Abrir una ventana durante el gesto del usuario ayuda
-    // a evitar que el navegador bloquee WhatsApp.
-    const whatsappWindow = window.open('about:blank', '_blank');
+  setSubmitting(true);
 
-    setSubmitting(true);
-
-    try {
-      // Generar el folio antes de insertar el registro.
-      const orderId = crypto.randomUUID();
-
-      const payloadWithId = {
-        ...payload,
-        id: orderId
-      };
-
-      // Insertar sin .select(), para no exigir permiso SELECT
-      // a los visitantes que envían una solicitud.
-      const { error } = await supabase
-        .from('subscriptions')
-        .insert(payloadWithId);
-
-      if (error) {
-        if (whatsappWindow && !whatsappWindow.closed) {
-          whatsappWindow.close();
-        }
-
-        console.error('Supabase insert error:', error);
-
-        setFormError(
-          'No se pudo registrar tu solicitud. Verifica tu conexión e inténtalo de nuevo.'
-        );
-
-        return;
+  try {
+    const { data: orderId, error } = await supabase.rpc(
+      'create_custom_order',
+      {
+        p_order: payload,
+        p_items: selectedMealRows.map((row) => ({
+          day_of_week: row.day_of_week,
+          menu_item_id: row.menu_item_id
+        }))
       }
+    );
 
-      const savedOrder = {
-        ...payloadWithId,
-        created_at: new Date().toISOString()
-      };
+    if (error) {
+      console.error('Error al crear pedido:', error);
 
-      setFormSuccess(
-        `Solicitud registrada correctamente. Folio: ${orderId
-          .slice(0, 8)
-          .toUpperCase()}.`
-      );
-
-      const message = makeWhatsAppMessage(savedOrder);
-      const chefPhone = normalizePhone(CHEF_WHATSAPP);
-
-      if (chefPhone && chefPhone !== '526690000000') {
-        const whatsappUrl =
-          `https://wa.me/${chefPhone}?text=${encodeURIComponent(message)}`;
-
-        if (whatsappWindow && !whatsappWindow.closed) {
-          whatsappWindow.location.href = whatsappUrl;
-        } else {
-          window.location.href = whatsappUrl;
-        }
-      } else {
-        if (whatsappWindow && !whatsappWindow.closed) {
-          whatsappWindow.close();
-        }
-
-        setFormSuccess(
-          'Solicitud registrada. Configura el número real del chef para activar WhatsApp.'
-        );
-      }
-
-      setForm({
-        customer_name: '',
-        phone: '',
-        diet: 'Balanceado',
-        delivery_zone: ZONES[0],
-        address: '',
-        delivery_reference: '',
-        dietary_notes: ''
-      });
-
-      setPlan('semanal');
-    } catch (error) {
       if (whatsappWindow && !whatsappWindow.closed) {
         whatsappWindow.close();
       }
 
-      console.error('Error al registrar la solicitud:', error);
-
       setFormError(
-        'Ocurrió un error inesperado al registrar la solicitud.'
+        error.message?.includes('no está disponible')
+          ? 'Uno de los platillos ya no está disponible. Actualiza el menú.'
+          : 'No se pudo registrar tu pedido. Revisa los datos e inténtalo de nuevo.'
       );
-    } finally {
-      setSubmitting(false);
+      return;
     }
+
+    const savedOrder = {
+      ...payload,
+      id: orderId,
+      plan: 'personalizado',
+      price_mxn: orderTotal,
+      selected_items: selectedMealRows.map((row) => ({
+        day_of_week: row.day_of_week,
+        meal_name: row.item.name,
+        unit_price_mxn: Number(row.item.price_mxn)
+      }))
+    };
+
+    setFormSuccess(
+      `Pedido registrado. Folio: ${String(orderId).slice(0, 8).toUpperCase()}.`
+    );
+
+    const message = makeWhatsAppMessage(savedOrder);
+    const chefPhone = normalizePhone(CHEF_WHATSAPP);
+
+    if (chefPhone && chefPhone !== '526690000000') {
+      const whatsappUrl =
+        `https://wa.me/${chefPhone}?text=${encodeURIComponent(message)}`;
+
+      if (whatsappWindow && !whatsappWindow.closed) {
+        whatsappWindow.location.href = whatsappUrl;
+      } else {
+        window.location.href = whatsappUrl;
+      }
+    } else {
+      if (whatsappWindow && !whatsappWindow.closed) {
+        whatsappWindow.close();
+      }
+
+      setFormSuccess(
+        'Pedido registrado. Configura el número real de Chef Iván para activar WhatsApp.'
+      );
+    }
+
+    setForm({
+      customer_name: '',
+      phone: '',
+      diet: 'Balanceado',
+      delivery_zone: ZONES[0],
+      address: '',
+      delivery_reference: '',
+      dietary_notes: ''
+    });
+
+    setSelectedMeals({});
+  } catch (error) {
+    console.error('Error al registrar el pedido:', error);
+
+    if (whatsappWindow && !whatsappWindow.closed) {
+      whatsappWindow.close();
+    }
+
+    setFormError('Ocurrió un error inesperado al registrar el pedido.');
+  } finally {
+    setSubmitting(false);
   }
+}
   /* -------------------------------------------------------
      AUTENTICACIÓN
      ------------------------------------------------------- */

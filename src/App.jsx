@@ -1179,7 +1179,7 @@ async function submitSubscription(event) {
               </p>
             </div>
 
-
+<form onSubmit={submitSubscription}>
 <div className="form-section-title">02 — Elige tus comidas</div>
 
 <p className="field-hint">

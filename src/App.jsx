@@ -1121,47 +1121,50 @@ async function submitSubscription(event) {
 
       {view === 'cliente' && (
         <main className="container">
-          <section className="hero">
-            <div className="hero-copy">
-              <div className="eyebrow">Your daily ritual</div>
+          
+<section className="hero hero-luxury">
+  <div className="hero-copy">
+    <div className="eyebrow">POMELO BRUNCH HOUSE · MAZATLÁN</div>
 
-              <h1>
-                Eat well.<br />
-                Feel <em>everything.</em>
-              </h1>
+    <h1>
+      Comer bien,
+      <br />
+      <em>sin complicarlo.</em>
+    </h1>
 
-              <p>
-                Comida real, ingredientes frescos y una rutina que te hace bien.
-                Tu semana saludable comienza aquí.
-              </p>
+    <p>
+      Comida hecha con intención. Ingredientes frescos y un menú
+      que se adapta a tu semana.
+    </p>
 
-              <button
-                className="hero-cta"
-                onClick={() =>
-                  document.getElementById('suscripcion')?.scrollIntoView({
-                    behavior: 'smooth'
-                  })
-                }
-              >
-                Encuentra tu plan <span>↘</span>
-              </button>
+    <button
+      className="hero-cta"
+      onClick={() =>
+        document.getElementById('suscripcion')?.scrollIntoView({
+          behavior: 'smooth'
+        })
+      }
+    >
+      Crear mi menú <span>↗</span>
+    </button>
 
-              <div className="hero-meta">
-                <span>✳</span> MEALS THAT MOVE WITH YOU
-              </div>
-            </div>
+    <div className="hero-meta">
+      COCINA FRESCA · A TU RITMO
+    </div>
+  </div>
 
-            <div className="hero-art">
-              <div className="art-circle">
-                <div className="art-plate">
-                  <div className="food-art">
-                    <span>✳</span>
-                  </div>
-                </div>
-              </div>
-              <div className="art-note">Fresh<br />every<br />weekday.</div>
-            </div>
-          </section>
+  <div className="hero-photo">
+    <img
+      src="/images/pomelo-hero.jpg"
+      alt="Platillo fresco preparado por Pomelo Brunch House"
+      fetchPriority="high"
+    />
+    <div className="hero-photo-caption">
+      <span>01 / DAILY NOURISHMENT</span>
+      <span>Hecho para tu día a día.</span>
+    </div>
+  </div>
+</section>
 
           <NutritionCalculator />
 
@@ -3286,6 +3289,290 @@ function Styles() {
     flex-direction: column;
   }
 }
+
+/* POMELO — QUIET LUXURY REDESIGN */
+
+:root {
+  --pomelo-bg: #F5F2EB;
+  --pomelo-paper: #FFFEFB;
+  --pomelo-ink: #252720;
+  --pomelo-olive: #555B43;
+  --pomelo-sand: #DCD3C5;
+  --pomelo-muted: #77766D;
+  --pomelo-line: #DEDAD1;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--pomelo-bg) !important;
+  color: var(--pomelo-ink) !important;
+  font-family: "DM Sans", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.top-strip {
+  background: var(--pomelo-ink) !important;
+  color: #F5F2EB !important;
+  letter-spacing: 0.16em;
+  font-size: 9px;
+  padding: 10px 16px;
+}
+
+.nav {
+  background: var(--pomelo-bg) !important;
+  border-bottom: 1px solid var(--pomelo-line);
+  box-shadow: none !important;
+  padding-top: 18px;
+  padding-bottom: 18px;
+}
+
+.brand-mark {
+  background: var(--pomelo-ink) !important;
+  color: var(--pomelo-bg) !important;
+  border-radius: 50%;
+}
+
+.brand-name {
+  font-family: "Cormorant Garamond", serif !important;
+  font-size: 23px;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+
+.brand-sub {
+  color: var(--pomelo-muted) !important;
+  letter-spacing: 0.1em;
+  font-size: 9px;
+}
+
+.nav-btn,
+.hero-cta,
+button.action-btn {
+  transition: background 180ms ease, color 180ms ease,
+    border-color 180ms ease, transform 180ms ease;
+}
+
+.nav-primary,
+.hero-cta,
+button.action-primary {
+  background: var(--pomelo-olive) !important;
+  color: #fff !important;
+  border: 1px solid var(--pomelo-olive) !important;
+  border-radius: 3px !important;
+  box-shadow: none !important;
+}
+
+.nav-primary:hover,
+.hero-cta:hover,
+button.action-primary:hover {
+  background: var(--pomelo-ink) !important;
+  border-color: var(--pomelo-ink) !important;
+}
+
+.container {
+  max-width: 1320px;
+  width: calc(100% - 80px);
+}
+
+.hero-luxury {
+  display: grid;
+  grid-template-columns: 0.85fr 1.15fr;
+  align-items: center;
+  gap: clamp(36px, 7vw, 100px);
+  padding: 76px 0 90px;
+  min-height: auto;
+}
+
+.hero-luxury .hero-copy {
+  max-width: 540px;
+}
+
+.hero-luxury .eyebrow {
+  color: var(--pomelo-olive) !important;
+  letter-spacing: 0.18em;
+  font-size: 10px;
+  margin-bottom: 28px;
+}
+
+.hero-luxury h1 {
+  font-family: "Cormorant Garamond", Georgia, serif !important;
+  font-size: clamp(54px, 6vw, 88px) !important;
+  font-weight: 400 !important;
+  line-height: 0.98 !important;
+  letter-spacing: -0.045em;
+  color: var(--pomelo-ink) !important;
+  margin: 0 0 25px;
+}
+
+.hero-luxury h1 em {
+  color: var(--pomelo-olive) !important;
+  font-weight: 400;
+}
+
+.hero-luxury .hero-copy > p {
+  max-width: 410px;
+  color: var(--pomelo-muted) !important;
+  font-size: 15px;
+  line-height: 1.9;
+}
+
+.hero-luxury .hero-cta {
+  margin-top: 22px;
+  padding: 16px 22px;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+}
+
+.hero-luxury .hero-meta {
+  margin-top: 44px;
+  color: var(--pomelo-muted) !important;
+  font-size: 9px;
+  letter-spacing: 0.15em;
+}
+
+.hero-photo {
+  position: relative;
+  min-width: 0;
+  aspect-ratio: 4 / 4.5;
+  max-height: 650px;
+  overflow: hidden;
+  background: var(--pomelo-sand);
+}
+
+.hero-photo img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  object-position: center;
+  transition: transform 700ms ease;
+}
+
+.hero-photo:hover img {
+  transform: scale(1.025);
+}
+
+.hero-photo-caption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 20px;
+  color: white;
+  background: linear-gradient(transparent, rgba(25, 25, 20, 0.65));
+  font-size: 10px;
+}
+
+.hero-photo-caption span:first-child {
+  letter-spacing: 0.1em;
+  font-size: 8px;
+}
+
+h2,
+h3,
+.section-heading h2 {
+  font-family: "Cormorant Garamond", Georgia, serif !important;
+  font-weight: 500 !important;
+  letter-spacing: -0.025em;
+}
+
+.section-heading h2 {
+  font-size: clamp(38px, 4.5vw, 58px) !important;
+}
+
+.field input,
+.field select,
+.field textarea,
+input,
+select,
+textarea {
+  border-radius: 3px;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline-color: var(--pomelo-olive);
+}
+
+@media (max-width: 760px) {
+  .container {
+    width: calc(100% - 36px);
+  }
+
+  .nav {
+    padding: 14px 18px;
+    gap: 12px;
+  }
+
+  .brand-name {
+    font-size: 19px;
+  }
+
+  .brand-sub {
+    font-size: 8px;
+  }
+
+  .nav-right {
+    gap: 6px;
+  }
+
+  .nav-btn {
+    font-size: 10px;
+    padding: 10px;
+  }
+
+  .hero-luxury {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    padding: 50px 0 58px;
+  }
+
+  .hero-luxury .hero-copy {
+    max-width: 100%;
+  }
+
+  .hero-luxury .hero-copy > p {
+    font-size: 14px;
+  }
+
+  .hero-luxury h1 {
+    font-size: clamp(51px, 13vw, 70px) !important;
+  }
+
+  .hero-luxury .hero-meta {
+    margin-top: 28px;
+  }
+
+  .hero-photo {
+    aspect-ratio: 4 / 3.5;
+    max-height: none;
+  }
+
+  .hero-photo-caption {
+    padding: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+  }
+}
+
     </style>
   );
 }
